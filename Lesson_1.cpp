@@ -83,7 +83,7 @@ public:
 	};
 
 	void reset();
-	void push(int data);
+	bool push(int data);
 	int pop();
 	void print();
 };
@@ -95,13 +95,15 @@ void Stack::reset() {
 	this->cursor = 0;
 };
 
-void Stack::push(int data) {
+bool Stack::push(int data) {
 	if (this->cursor > 9) {
 		std::cout << "Stack is full" << std::endl;
+		return false;
 	}
 	else {
 		this->stackMembers[this->cursor] = data;
 		this->cursor++;
+		return true;
 	}
 };
 
