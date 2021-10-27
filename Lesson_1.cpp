@@ -1,137 +1,256 @@
 ﻿#include <iostream>
 #include <cstdint>
+#include <cassert>
 
 /* Задание 1
-* Создать класс Person (человек) с полями: имя, возраст, пол и вес. Определить методы переназначения имени, 
-* изменения возраста и веса. Создать производный класс Student (студент), имеющий поле года обучения.
-* Определить методы переназначения и увеличения этого значения. Создать счетчик количества созданных студентов.
-* В функции main() создать несколько (не больше трёх) студентов. Вывести информацию о них.
+* Создать абстрактный класс Figure (фигура). Его наследниками являются классы Parallelogram (параллелограмм) и Circle (круг). 
+* Класс Parallelogram — базовый для классов Rectangle (прямоугольник), Square (квадрат), Rhombus (ромб).
+* Для всех классов создать конструкторы. Для класса Figure добавить чисто виртуальную функцию area() (площадь).
+* Во всех остальных классах переопределить эту функцию, исходя из геометрических формул нахождения площади.
 */
 
-int studentsCount = 0;
-
-class Person {
-	std::string name;
-	std::string gender;
-	int age;
-	int veight;
-
+class Figure {
 public:
-	// Можно было засунуть геттеры и сеттеры в protected, но я посчитал, что нам может потребоваться в любой момент любая информация о студенте 
-	// в отрыве от остальных данных. Например, только имя и возраст или только пол (если захотим посчитать % парней и девушек)
-	// так что удобнее сделать геттеры и сеттеры в публичном поле
-
-	void setName(std::string newName) { name = newName;	}
-	void setAge(int newAge) { age = newAge; }
-	void setVeight(int newVeight) { veight = newVeight; }
-
-	std::string getName() { return name; }
-	std::string getGender() { return gender; }
-	int getAge() { return age; }
-	int getVeight() { return veight; }
-
-	Person(std::string newName, std::string newGender, int newAge, int newVeight) : name(newName), gender(newGender), age(newAge), veight(newVeight){ }
+	Figure() {}
+	virtual int area() = 0;
 };
 
-class Student : public Person {
-	int studyYear;
-
+class Parallelogram : public Figure {
+	int sideA;
+	int sideB; // длина высоты проведенной к вершине стороны А
 public:
-	Student(std::string name, std::string gender, int age, int veight, int newStudyYear) : Person(name, gender, age, veight) {
-		studyYear = newStudyYear;
-		studentsCount++;
-	}
+	Parallelogram(int newSideA, int newSideB) : sideA(newSideA), sideB(newSideB) { };
 
-	~Student() {
-		studentsCount--;
-	}
+	virtual ~Parallelogram() {};
 
-	void setStudyYear(int newStudyYear) { studyYear = newStudyYear; }
-	int getStudyYear() { return studyYear; }
-	void getStudentData();
+	int getSideA() { return sideA; }
+	int getSideB() { return sideB; }
+	int area() override {
+		return sideA * sideB;
+	}
 };
 
-void Student::getStudentData() {
-	std::cout << "Name: " << this->getName() << std::endl << "Gender: " << this->getGender() << std::endl << "Age: " << this->getAge() << std::endl << "Veight: " << this->getVeight() << std::endl << "Study year: " << this->getStudyYear() << std::endl;
+class Circle : public Figure {
+	double radius;
+public:
+	Circle(int r) : radius(r) {}
+	int area() override {
+		//Если Вы не против, я тут не буду подключать математические либы, это же все-таки задача не по математике, а по ООП :) ограничусь схематическим видом числа Пи
+		return 3.14 * radius * radius;
+	}
+	int getRadius() { return radius; }
+};
+
+class Rectangle : public Parallelogram {
+public:
+	Rectangle(int newSideA, int newSideB) : Parallelogram(newSideA, newSideB) { };
+
+	int area() override {
+		return this->getSideA() * this->getSideB();
+	}
+};
+
+class Square : public Parallelogram {
+public:
+	Square(int newSideA, int newSideB = 0) : Parallelogram(newSideA, newSideA) { };
+
+	int area() override {
+		return this->getSideA() * this->getSideA();
+	}
+};
+
+class Rhombus : public Parallelogram {
+public:
+	Rhombus(int newSideA, int newSideB) : Parallelogram(newSideA, newSideB) { };
+	// расчет ведем через сторону и высоту к данной стороне ромба
+	int area() override {
+		return this->getSideA() * this->getSideB();
+	}
 };
 
 /* Задание 2
-* Создать классы Apple (яблоко) и Banana (банан), которые наследуют класс Fruit (фрукт). 
-* У Fruit есть две переменные-члена: name (имя) и color (цвет). Добавить новый класс GrannySmith, который наследует класс Apple.
+* Создать класс Car (автомобиль) с полями company (компания) и model (модель). Классы-наследники:
+* PassengerCar (легковой автомобиль) и Bus (автобус). От этих классов наследует класс Minivan (минивэн).
+* Создать конструкторы для каждого из классов, чтобы они выводили данные о классах. Создать объекты для
+* каждого из классов и посмотреть, в какой последовательности выполняются конструкторы. Обратить внимание на проблему «алмаз смерти».
 */
 
-class Fruit {
+class Car {
 	std::string name;
-	std::string color;
-
-protected:
-	void setName(std::string newName) { name = newName;	}
-	void setColor(std::string newColor) { color = newColor; }
-
+	std::string model;
 public:
+	Car(std::string newName, std::string newModel) : name(newName), model(newModel) {
+		std::cout << "Car constructor" << std::endl;
+	}
 
-	Fruit(std::string newName, std::string newColor) : name(newName), color(newColor){ }
-	std::string getName() { return name; }
-	std::string getColor() { return color; }
+	virtual ~Car() {}
 };
 
-class Apple : public Fruit {
+class PassengerCar : virtual public Car{
 public:
-	Apple(std::string color = "green") : Fruit("apple", color) {}
-	Apple(std::string name, std::string color) : Fruit(name, color) {}
+	PassengerCar(std::string newName, std::string newModel) : Car(newName, newModel) {
+		std::cout << "PassengerCar constructor" << std::endl;
+	}
+
 };
 
-class Banana : public Fruit {
+class Bus : virtual public Car{
 public:
-	Banana(std::string color = "yellow") : Fruit("banana", color) {}
+	Bus(std::string newName, std::string newModel) : Car(newName, newModel) {
+		std::cout << "Bus constructor" << std::endl;
+	}
+
 };
 
-class GrannySmith : public Apple {
+class Minivan : public PassengerCar, public Bus {
 public:
-	GrannySmith() : Apple("Granny Smith apple", "green") {}
+	// Если не делать виртуадльное наследование у классов PassengerCar и Bus, то класс Car создастся два раза, для каждого из родительских классов
+	// Minivan(std::string newName, std::string newModel) : PassengerCar(newName, newModel), Bus(newName, newModel) {
+	Minivan(std::string newName, std::string newModel) : PassengerCar(newName, newModel), Bus(newName, newModel) , Car(newName, newModel) { 		
+		std::cout << "Minivan constructor" << std::endl;
+	}
+
+};
+
+/* Задание 3
+* Создать класс: Fraction (дробь). Дробь имеет числитель и знаменатель (например, 3/7 или 9/2). Предусмотреть, чтобы знаменатель не был равен 0. Перегрузить:
+* математические бинарные операторы (+, -, *, /) для выполнения действий с дробями
+* унарный оператор (-)
+* логические операторы сравнения двух дробей (==, !=, <, >, <=, >=).
+*/
+
+class Fraction {
+	int num;
+	int divider;
+public:
+	Fraction(int newNum, int newDivider = 1) {
+		// Проверку нагуглил :(
+		assert(newDivider != 0);
+		num = newNum;
+		divider = newDivider;
+	}
+	int getNum() { return num; }
+	int getDivider() { return divider; }
+
+	friend Fraction operator+(const Fraction& l, const Fraction& r);
+	friend Fraction operator/(const Fraction& l, const Fraction& r);
+	friend bool operator>(const Fraction& l, const Fraction& r);
+};
+
+Fraction operator+(const Fraction& l, const Fraction& r) {
+	if (l.divider == r.divider) {
+		return Fraction(l.num + r.num, r.divider);
+	}
+	else {
+		if ((l.divider % r.divider) == 0) 
+		{
+			return Fraction((l.num * (l.divider / r.divider)) + r.num, l.divider);
+		}
+		else if ((r.divider % l.divider) == 0)
+		{
+			return Fraction(l.num + (r.num * (r.divider / l.divider)), r.divider);
+		}
+		else {
+			return Fraction((l.num * r.divider) + (r.num * l.divider), l.divider * r.divider);
+		}		
+	}
+};
+
+Fraction operator/(const Fraction& l, const Fraction& r) {
+	return Fraction((l.num * r.divider), (r.num * l.divider));
+};
+
+bool operator>(const Fraction& l, const Fraction& r) {
+	bool res;
+	if (l.divider == r.divider) {
+		res = (l.num > r.num) ? true : false;
+	}
+	else {
+		res = ((l.num * r.divider) > (r.num * l.divider)) ? true : false;
+	}
+
+	return res;
+};
+
+/* Задание 4
+* Создать класс Card, описывающий карту в игре БлэкДжек. У этого класса должно быть три поля: масть, значение карты и положение карты (вверх лицом или рубашкой). 
+* Сделать поля масть и значение карты типом перечисления (enum). Положение карты - тип bool. Также в этом классе должно быть два метода: 
+* метод Flip(), который переворачивает карту, т.е. если она была рубашкой вверх, то он ее поворачивает лицом вверх, и наоборот.
+* метод GetValue(), который возвращает значение карты, пока можно считать, что туз = 1.
+*/
+
+enum cardSuit {
+	HEARTS,
+	SPADES,
+	DIAMONDS,
+	CLUBS
+};
+
+enum cardValue {
+	TWO = 2,
+	THREE = 3,
+	FOUR = 4,
+	FIVE = 5,
+	SIX = 6,
+	SEVEN = 7,
+	EIGHT = 8,
+	NINE = 9,
+	TEN = 10,
+	JACK = 11,
+	QUEEN = 12,
+	KING = 13,
+	ACE = 1
+};
+
+class Card {
+	cardSuit suit;
+	cardValue value;
+	bool cardPos;
+public:
+	Card(cardSuit newSuit, cardValue newValue, bool newPos) : suit(newSuit), value(newValue), cardPos(newPos) {}
+	virtual ~Card() {}
+
+	cardSuit getSuit() { return suit; }
+	cardValue getValue() { return value; }
+	bool getPos() { return cardPos; }
+
+	void flip() {
+		cardPos = !cardPos;
+	}
 };
 
 int main()
 {
 	// Задание 1
-	
-	Student s0("John Doe", "Male", 22, 85, 4);
-	std::cout << "Student 0: " << std::endl;
-	s0.getStudentData();
-
-	std::cout << std::endl << "Students count: " << studentsCount << std::endl << std::endl;
-
-	Student s1("Jane Doe", "Female", 21, 55, 2);
-	Student s2("Steve Rogers", "Male", 23, 88, 4);
-
-	std::cout << "Student 1: " << std::endl;
-	s1.getStudentData();
-	std::cout << std::endl;
-	std::cout << "Student 2: " << std::endl;
-	s2.getStudentData();
-	std::cout << std::endl << "Students count: " << studentsCount << std::endl << std::endl;
+	Rectangle rec1(4, 6);
+	Rhombus rh1(5, 8);
+	Circle cr1(7);
+	std::cout << "Rectangle square: " << rec1.getSideA() << " * " << rec1.getSideB() << " = " << rec1.area() << std::endl;
+	std::cout << "Rhombus square: " << rh1.getSideA() << " * " << rh1.getSideB() << " = " << rh1.area() << std::endl;
+	std::cout << "Circle square: " << cr1.getRadius() << " = " << cr1.area() << std::endl;
 
 	// Задание 2
+	Minivan mini0("Hiace", "Toyota");
 
-	Apple a0("red");
-	Banana b0;
-	GrannySmith c0;
+	// Задание 3
 
-	std::cout << "My " << a0.getName() << " is " << a0.getColor() << ".\n";
-	std::cout << "My " << b0.getName() << " is " << b0.getColor() << ".\n";
-	std::cout << "My " << c0.getName() << " is " << c0.getColor() << ".\n";
+	Fraction f0(2, 3);
+	Fraction f1(3, 5);
+	std::cout << "Fractions : " << f0.getNum() << "/" << f0.getDivider() << ", " << f1.getNum() << "/" << f1.getDivider() << std::endl;
+	Fraction fRes = f0 + f1;
+	std::cout << "Result summ: " << fRes.getNum() << "/" << fRes.getDivider() << std::endl;
+	fRes = f0 / f1;
+	std::cout << "Result divide: " << fRes.getNum() << "/" << fRes.getDivider() << std::endl;
+	bool compare;
+	compare = f0 > f1;
+	std::cout << "Result compare: " << ((compare) ? "Left is bigger" : "Right is bigger") << std::endl;
 
-	/* Задание 3
-	* Создаем класс Player. У него будет три свойства
-	* int cards - число карт на руках
-	* int sum - сумма очков
-	* int deal - текущая ставка
-	* 
-	* И методы 
-	* getCard() - добавляет карту и пересчитывает сумму очков
-	* 1to1() - в сулчае если у дилера первая карта 10 или туз
-	* hold() - оставить текущее число карт 
-	*/
+	// Задание 4
+	Card c0(HEARTS, JACK, true);
+	std::cout << "Card value: " << c0.getValue() << std::endl;
+	std::cout << "Card position: " << ((c0.getPos()) ? "Suite down" : "Suite up") << std::endl;
+	c0.flip();
+	std::cout << "Card position: " << ((c0.getPos()) ? "Suite down" : "Suite up") << std::endl;
 
 	return 0;
 }
