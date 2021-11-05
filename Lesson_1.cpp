@@ -1,256 +1,185 @@
 ﻿#include <iostream>
-#include <cstdint>
 #include <cassert>
+#include <vector>
+
+#include "Card.cpp"
 
 /* Задание 1
-* Создать абстрактный класс Figure (фигура). Его наследниками являются классы Parallelogram (параллелограмм) и Circle (круг). 
-* Класс Parallelogram — базовый для классов Rectangle (прямоугольник), Square (квадрат), Rhombus (ромб).
-* Для всех классов создать конструкторы. Для класса Figure добавить чисто виртуальную функцию area() (площадь).
-* Во всех остальных классах переопределить эту функцию, исходя из геометрических формул нахождения площади.
+* Добавить в контейнерный класс, который был написан в этом уроке, методы:
+* для удаления последнего элемента массива (аналог функции pop_back() в векторах)
+* для удаления первого элемента массива (аналог pop_front() в векторах)
+* для сортировки массива
+* для вывода на экран элементов.
 */
 
-class Figure {
+
+class DataContainer {
+    int* data;
+    int size;
+    int capacity;
+    int& operator[](int idx) { }
+
 public:
-	Figure() {}
-	virtual int area() = 0;
-};
+    DataContainer() : size(0), data(nullptr) {
+        capacity = 0;
+    }
+    DataContainer(int _size) : size(_size) {
+        if (_size == 0) {
+            DataContainer();
+        }
+        else if (_size > 0) {
+            data = new int[_size];
+            capacity = 0;
+        }
+        else {
+            printf("Bad things happened!\n");
+            DataContainer();
+        }
+    }
+    ~DataContainer() {
+        delete[] data;
+    }
+    void erase()
+    {
+        delete[] data;
+        data = nullptr;
+        size = 0;
+    }
 
-class Parallelogram : public Figure {
-	int sideA;
-	int sideB; // длина высоты проведенной к вершине стороны А
-public:
-	Parallelogram(int newSideA, int newSideB) : sideA(newSideA), sideB(newSideB) { };
+    void setData(int idx, int value) {
+        assert(idx >= 0 && idx < size);
+        this->data[idx] = value;
+    }
+    int getData(int idx) const {
+        assert(idx >= 0 && idx < size);
+        return data[idx];
+    }
+    int getCapacity() {
+        return this->capacity;
+    }
+    void resize(int newLength) {
+        if (newLength == size) return;
+        if (newLength <= 0) {
+            erase();
+            return;
+        }
 
-	virtual ~Parallelogram() {};
+        int* newData = new int[newLength];
+        if (size > 0) {
+            int elementsToCopy = (newLength > size) ? size : newLength;
+            for (int idx = 0; idx < elementsToCopy; ++idx)
+                newData[idx] = data[idx];
+        }
+        delete[] data;
 
-	int getSideA() { return sideA; }
-	int getSideB() { return sideB; }
-	int area() override {
-		return sideA * sideB;
-	}
-};
+        data = newData;
+        size = newLength;
+    }
 
-class Circle : public Figure {
-	double radius;
-public:
-	Circle(int r) : radius(r) {}
-	int area() override {
-		//Если Вы не против, я тут не буду подключать математические либы, это же все-таки задача не по математике, а по ООП :) ограничусь схематическим видом числа Пи
-		return 3.14 * radius * radius;
-	}
-	int getRadius() { return radius; }
-};
+    // ^ До этих пор скопировал из методички / файла с сайта
 
-class Rectangle : public Parallelogram {
-public:
-	Rectangle(int newSideA, int newSideB) : Parallelogram(newSideA, newSideB) { };
+    void insertLast(int value) {
+        resize(size + 1);
+        setData(size - 1, value);
+    }
+    int returnLast() {
+        return getData(size - 1);
+    }
+    int removeLast() {
+        int tmpVal = getData(size - 1);
+        resize(size - 1);
+        return tmpVal;
+    }
+    int returnFirst() {
+        return getData(0);
+    }
+    int removeFirst() {
+        int tmpVal = getData(0);
+        for (int i = 1; i < size; ++i)
+            data[i - 1] = data[i];
 
-	int area() override {
-		return this->getSideA() * this->getSideB();
-	}
-};
-
-class Square : public Parallelogram {
-public:
-	Square(int newSideA, int newSideB = 0) : Parallelogram(newSideA, newSideA) { };
-
-	int area() override {
-		return this->getSideA() * this->getSideA();
-	}
-};
-
-class Rhombus : public Parallelogram {
-public:
-	Rhombus(int newSideA, int newSideB) : Parallelogram(newSideA, newSideB) { };
-	// расчет ведем через сторону и высоту к данной стороне ромба
-	int area() override {
-		return this->getSideA() * this->getSideB();
-	}
-};
-
-/* Задание 2
-* Создать класс Car (автомобиль) с полями company (компания) и model (модель). Классы-наследники:
-* PassengerCar (легковой автомобиль) и Bus (автобус). От этих классов наследует класс Minivan (минивэн).
-* Создать конструкторы для каждого из классов, чтобы они выводили данные о классах. Создать объекты для
-* каждого из классов и посмотреть, в какой последовательности выполняются конструкторы. Обратить внимание на проблему «алмаз смерти».
-*/
-
-class Car {
-	std::string name;
-	std::string model;
-public:
-	Car(std::string newName, std::string newModel) : name(newName), model(newModel) {
-		std::cout << "Car constructor" << std::endl;
-	}
-
-	virtual ~Car() {}
-};
-
-class PassengerCar : virtual public Car{
-public:
-	PassengerCar(std::string newName, std::string newModel) : Car(newName, newModel) {
-		std::cout << "PassengerCar constructor" << std::endl;
-	}
-
-};
-
-class Bus : virtual public Car{
-public:
-	Bus(std::string newName, std::string newModel) : Car(newName, newModel) {
-		std::cout << "Bus constructor" << std::endl;
-	}
-
-};
-
-class Minivan : public PassengerCar, public Bus {
-public:
-	// Если не делать виртуадльное наследование у классов PassengerCar и Bus, то класс Car создастся два раза, для каждого из родительских классов
-	// Minivan(std::string newName, std::string newModel) : PassengerCar(newName, newModel), Bus(newName, newModel) {
-	Minivan(std::string newName, std::string newModel) : PassengerCar(newName, newModel), Bus(newName, newModel) , Car(newName, newModel) { 		
-		std::cout << "Minivan constructor" << std::endl;
-	}
-
+        resize(size - 1);
+        return tmpVal;
+    }
+    void print() {
+        for (int i = 0; i < size; ++i) {
+            std::cout << data[i] << ", " << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    void sort() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size - 1; j++) {
+                if (data[i] > data[i + 1]) {
+                    int t = data[i];
+                    data[i] = data[i + 1];
+                    data[i + 1] = t;
+                }
+            }
+        }
+    }
 };
 
 /* Задание 3
-* Создать класс: Fraction (дробь). Дробь имеет числитель и знаменатель (например, 3/7 или 9/2). Предусмотреть, чтобы знаменатель не был равен 0. Перегрузить:
-* математические бинарные операторы (+, -, *, /) для выполнения действий с дробями
-* унарный оператор (-)
-* логические операторы сравнения двух дробей (==, !=, <, >, <=, >=).
+* Реализовать класс Hand, который представляет собой коллекцию карт.В классе будет одно поле : вектор указателей карт(удобно использовать вектор, 
+* т.к.это по сути динамический массив, а тип его элементов должен быть - указатель на объекты класса Card).Также в классе Hand должно быть 3 метода :
+* метод Add, который добавляет в коллекцию карт новую карту, соответственно он принимает в качестве параметра указатель на новую карту
+* метод Clear, который очищает руку от карт
+* метод GetValue, который возвращает сумму очков карт руки(здесь предусмотреть возможность того, что туз может быть равен 11).
 */
 
-class Fraction {
-	int num;
-	int divider;
+class Hand {
+    std::vector<Card*> cards;
 public:
-	Fraction(int newNum, int newDivider = 1) {
-		// Проверку нагуглил :(
-		assert(newDivider != 0);
-		num = newNum;
-		divider = newDivider;
-	}
-	int getNum() { return num; }
-	int getDivider() { return divider; }
-
-	friend Fraction operator+(const Fraction& l, const Fraction& r);
-	friend Fraction operator/(const Fraction& l, const Fraction& r);
-	friend bool operator>(const Fraction& l, const Fraction& r);
+    void add(Card* card);
+    void clear();
+    int GetValue();
+};
+void Hand::add(Card* card) {
+    cards.push_back(card);
 };
 
-Fraction operator+(const Fraction& l, const Fraction& r) {
-	if (l.divider == r.divider) {
-		return Fraction(l.num + r.num, r.divider);
-	}
-	else {
-		if ((l.divider % r.divider) == 0) 
-		{
-			return Fraction((l.num * (l.divider / r.divider)) + r.num, l.divider);
-		}
-		else if ((r.divider % l.divider) == 0)
-		{
-			return Fraction(l.num + (r.num * (r.divider / l.divider)), r.divider);
-		}
-		else {
-			return Fraction((l.num * r.divider) + (r.num * l.divider), l.divider * r.divider);
-		}		
-	}
+void Hand::clear() {
+    cards.clear();
 };
 
-Fraction operator/(const Fraction& l, const Fraction& r) {
-	return Fraction((l.num * r.divider), (r.num * l.divider));
-};
-
-bool operator>(const Fraction& l, const Fraction& r) {
-	bool res;
-	if (l.divider == r.divider) {
-		res = (l.num > r.num) ? true : false;
-	}
-	else {
-		res = ((l.num * r.divider) > (r.num * l.divider)) ? true : false;
-	}
-
-	return res;
-};
-
-/* Задание 4
-* Создать класс Card, описывающий карту в игре БлэкДжек. У этого класса должно быть три поля: масть, значение карты и положение карты (вверх лицом или рубашкой). 
-* Сделать поля масть и значение карты типом перечисления (enum). Положение карты - тип bool. Также в этом классе должно быть два метода: 
-* метод Flip(), который переворачивает карту, т.е. если она была рубашкой вверх, то он ее поворачивает лицом вверх, и наоборот.
-* метод GetValue(), который возвращает значение карты, пока можно считать, что туз = 1.
-*/
-
-enum cardSuit {
-	HEARTS,
-	SPADES,
-	DIAMONDS,
-	CLUBS
-};
-
-enum cardValue {
-	TWO = 2,
-	THREE = 3,
-	FOUR = 4,
-	FIVE = 5,
-	SIX = 6,
-	SEVEN = 7,
-	EIGHT = 8,
-	NINE = 9,
-	TEN = 10,
-	JACK = 11,
-	QUEEN = 12,
-	KING = 13,
-	ACE = 1
-};
-
-class Card {
-	cardSuit suit;
-	cardValue value;
-	bool cardPos;
-public:
-	Card(cardSuit newSuit, cardValue newValue, bool newPos) : suit(newSuit), value(newValue), cardPos(newPos) {}
-	virtual ~Card() {}
-
-	cardSuit getSuit() { return suit; }
-	cardValue getValue() { return value; }
-	bool getPos() { return cardPos; }
-
-	void flip() {
-		cardPos = !cardPos;
-	}
-};
+int Hand::GetValue() {
+    int result = 0;
+    int aces = 0;
+    for (auto const& i : cards) {
+        if (result < 21 && i->getValue() == ACE) {
+            result += 11;
+        }
+        else {
+            result += i->getValue();
+        }
+    }
+    return result;
+}
 
 int main()
 {
-	// Задание 1
-	Rectangle rec1(4, 6);
-	Rhombus rh1(5, 8);
-	Circle cr1(7);
-	std::cout << "Rectangle square: " << rec1.getSideA() << " * " << rec1.getSideB() << " = " << rec1.area() << std::endl;
-	std::cout << "Rhombus square: " << rh1.getSideA() << " * " << rh1.getSideB() << " = " << rh1.area() << std::endl;
-	std::cout << "Circle square: " << cr1.getRadius() << " = " << cr1.area() << std::endl;
+    /* Задание 2
+    Дан вектор чисел, требуется выяснить, сколько среди них различных. Постараться использовать максимально быстрый алгоритм.
+    */
+    std::vector<int> data = { 7,8,3,2,2,3,1,8,12,4,3,8 };
+    std::vector<int> helpVec;
+    helpVec.push_back(data.at(0));
 
-	// Задание 2
-	Minivan mini0("Hiace", "Toyota");
+    for (auto const& i : data) {
+        bool isUnique = false;
+        for (auto j = helpVec.begin(); j != helpVec.end(); j++)
+            if (i == *j) {
+                isUnique = true;
+            }
 
-	// Задание 3
+        if (!isUnique) {
+            helpVec.push_back(i);
+        }
+    }
 
-	Fraction f0(2, 3);
-	Fraction f1(3, 5);
-	std::cout << "Fractions : " << f0.getNum() << "/" << f0.getDivider() << ", " << f1.getNum() << "/" << f1.getDivider() << std::endl;
-	Fraction fRes = f0 + f1;
-	std::cout << "Result summ: " << fRes.getNum() << "/" << fRes.getDivider() << std::endl;
-	fRes = f0 / f1;
-	std::cout << "Result divide: " << fRes.getNum() << "/" << fRes.getDivider() << std::endl;
-	bool compare;
-	compare = f0 > f1;
-	std::cout << "Result compare: " << ((compare) ? "Left is bigger" : "Right is bigger") << std::endl;
+    std::cout << "Number of unique values is: " << helpVec.size() << std::endl;
 
-	// Задание 4
-	Card c0(HEARTS, JACK, true);
-	std::cout << "Card value: " << c0.getValue() << std::endl;
-	std::cout << "Card position: " << ((c0.getPos()) ? "Suite down" : "Suite up") << std::endl;
-	c0.flip();
-	std::cout << "Card position: " << ((c0.getPos()) ? "Suite down" : "Suite up") << std::endl;
 
 	return 0;
 }
