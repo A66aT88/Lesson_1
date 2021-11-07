@@ -1,39 +1,10 @@
-enum cardSuit {
-	HEARTS,
-	SPADES,
-	DIAMONDS,
-	CLUBS
-};
+#include "Card.h"
 
-enum cardValue {
-	TWO = 2,
-	THREE = 3,
-	FOUR = 4,
-	FIVE = 5,
-	SIX = 6,
-	SEVEN = 7,
-	EIGHT = 8,
-	NINE = 9,
-	TEN = 10,
-	JACK = 11,
-	QUEEN = 12,
-	KING = 13,
-	ACE = 1
-};
+cardSuit Card::getSuit() { return suit; }
 
-class Card {
-	cardSuit suit;
-	cardValue value;
-	bool cardPos;
-public:
-	Card(cardSuit newSuit, cardValue newValue, bool newPos) : suit(newSuit), value(newValue), cardPos(newPos) {}
-	virtual ~Card() {}
+cardValue Card::getValue() { return value; }
+bool Card::getPos() { return cardPos; }
 
-	cardSuit getSuit() { return suit; }
-	cardValue getValue() { return value; }
-	bool getPos() { return cardPos; }
-
-	void flip() {
-		cardPos = !cardPos;
-	}
-};
+void Card::flip() {
+	cardPos = !cardPos;
+}
