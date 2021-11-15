@@ -1,9 +1,9 @@
 #include "Card.h"
 
-cardSuit Card::getSuit() { return suit; }
+cardSuit Card::getSuit() const { return suit; }
 
-cardValue Card::getValue() { return value; }
-bool Card::getPos() { return cardPos; }
+cardValue Card::getValue() const { return value; }
+bool Card::getPos() const { return cardPos; }
 
 void Card::flip() {
 	cardPos = !cardPos;

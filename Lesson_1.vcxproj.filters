@@ -24,12 +24,18 @@
     <ClCompile Include="Hand.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="GenericPlayer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Hand.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Card.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericPlayer.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>

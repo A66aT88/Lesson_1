@@ -1,9 +1,10 @@
 #pragma once
 #include "Card.h"
+#include "vector"
 
 class Hand {
-    std::vector<Card*> cards;
 public:
+    std::vector<Card*> cards;
     Hand() {}
     void add(Card* card);
     void clear();

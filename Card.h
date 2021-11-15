@@ -1,4 +1,6 @@
 #pragma once
+#include "iostream"
+
 enum cardSuit {
 	HEARTS,
 	SPADES,
@@ -30,9 +32,11 @@ public:
 	Card(cardSuit newSuit, cardValue newValue, bool newPos) : suit(newSuit), value(newValue), cardPos(newPos) {}
 	virtual ~Card() {}
 
-	cardSuit getSuit();
-	cardValue getValue();
-	bool getPos();
+	cardSuit getSuit() const;
+	cardValue getValue() const;
+	bool getPos() const;
 
 	void flip();
+
+	friend std::ostream& operator<< (std::ostream& out, const Card& string);
 };
