@@ -11,7 +11,7 @@ void Hand::clear() {
     cards.clear();
 };
 
-int Hand::GetValue() {
+int Hand::GetValue() const {
     int result = 0;
     for (auto const& i : cards) {
         if (result < 21 && i->getValue() == ACE) {

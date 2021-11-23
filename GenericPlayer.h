@@ -7,7 +7,7 @@ class GenericPlayer : public Hand {
 public:
 	GenericPlayer(std::string newName) : Hand(), name(newName) {}
 	std::string getName() const { return name; }
-	virtual bool isHitting() = 0;
+	virtual bool isHitting() const = 0;
 	bool isBoosted();
 	void Bust();
 

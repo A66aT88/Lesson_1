@@ -9,6 +9,7 @@ enum cardSuit {
 };
 
 enum cardValue {
+	ACE = 1,
 	TWO = 2,
 	THREE = 3,
 	FOUR = 4,
@@ -18,17 +19,16 @@ enum cardValue {
 	EIGHT = 8,
 	NINE = 9,
 	TEN = 10,
-	JACK = 11,
-	QUEEN = 12,
-	KING = 13,
-	ACE = 1
+	JACK = 10,
+	QUEEN = 10,
+	KING = 10
 };
 
 class Card {
+public:
 	cardSuit suit;
 	cardValue value;
 	bool cardPos;
-public:
 	Card(cardSuit newSuit, cardValue newValue, bool newPos) : suit(newSuit), value(newValue), cardPos(newPos) {}
 	virtual ~Card() {}
 

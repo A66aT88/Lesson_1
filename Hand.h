@@ -8,5 +8,5 @@ public:
     Hand() {}
     void add(Card* card);
     void clear();
-    int GetValue();
+    int GetValue() const;
 };
